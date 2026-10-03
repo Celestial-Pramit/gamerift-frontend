@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+/* Design tokens: colors and fonts */
+@theme {
+  --color-base: #0a0a0f;
+  --color-side: #0e0e14;
+  --color-card: #14141d;
+  --color-line: #24243a;
+  --color-brand: #a24bff;
+  --color-brand-hi: #b76bff;
+  --color-neon: #19e3d2;
+  --color-live: #ff3b5c;
+  --color-gold: #f5b942;
+  --color-muted: #8b8ba7;
+  --font-display: "Orbitron", sans-serif;
+  --font-head: "Rajdhani", sans-serif;
+  --font-sans: "Inter", sans-serif;
+}
+
+body { background: #0a0a0f; color: #f3f3fa; font-family: var(--font-sans); }
+
+/* Gamer helpers */
+.cut { clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%); }
+.glow { transition: box-shadow 0.2s; }
+.glow:hover { box-shadow: 0 0 22px rgba(162, 75, 255, 0.5); }
+.live-dot { animation: pulse 1.4s infinite; }
+.hero-bg { background: linear-gradient(120deg, #a24bff33, #19e3d222, #2563ff33); background-size: 200% 200%; animation: shift 8s ease infinite; }
+.scan::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0 1px, transparent 1px 3px); }
+.glitch:hover { animation: glitch 0.3s steps(2) 2; }
+.marquee { animation: marquee 30s linear infinite; }
+.marquee:hover { animation-play-state: paused; }
+
+@keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.5); } }
+@keyframes shift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+@keyframes glitch { 25% { transform: translate(-2px, 1px); text-shadow: 2px 0 #19e3d2, -2px 0 #ff3b5c; } 50% { transform: translate(2px, -1px); } }
+@keyframes marquee { to { transform: translateX(-50%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after { animation: none !important; transition: none !important; }
+}
+
+/* ---------- Polish: spec look (scanlines + noise, gradient border, cut buttons) ---------- */
+html { scroll-behavior: smooth; }
+.landing-bg { background: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(162,75,255,0.25), transparent 70%), radial-gradient(ellipse 50% 50% at 85% 40%, rgba(25,227,210,0.16), transparent 70%), #08080d; }
+.scan { position: relative; isolation: isolate; }
+.scan::before { content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none; border-radius: inherit; opacity: 0.5; background: repeating-linear-gradient(180deg, rgba(255,255,255,0.045) 0 1px, transparent 1px 3px); mix-blend-mode: screen; }
+.scan::after { content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none; border-radius: inherit; opacity: 0.28; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E"); mix-blend-mode: overlay; }
+
+@property --ang { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+.gradborder { border: 1px solid transparent; background: linear-gradient(var(--gb-fill, #08080d), var(--gb-fill, #08080d)) padding-box, conic-gradient(from var(--ang), #a24bff, #19e3d2, #2563ff, #a24bff) border-box; animation: ang 6s linear infinite; }
+@keyframes ang { to { --ang: 360deg; } }
+
+.cut-btn { clip-path: polygon(0 0, 100% 0, 100% 68%, calc(100% - 10px) 100%, 0 100%); }
+.btn-cut { display: inline-flex; align-items: center; justify-content: center; gap: 8px; clip-path: polygon(0 0, 100% 0, 100% 68%, calc(100% - 10px) 100%, 0 100%); font-family: var(--font-head); font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; transition: 0.2s; }
+.btn-pri { background: linear-gradient(135deg, #a24bff, #8a2be2); color: #fff; }
+.btn-pri:hover { background: linear-gradient(135deg, #b76bff, #a24bff); transform: translateY(-1px); }
+.btn-sec { border: 1px solid rgba(162,75,255,0.5); color: #d9c4ff; background: rgba(162,75,255,0.07); }
+
+.gradtext { background: linear-gradient(100deg, #fff 8%, #a24bff 42%, #19e3d2 78%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.demo-art { background: radial-gradient(circle at 35% 45%, rgba(162,75,255,0.55), transparent 55%), radial-gradient(circle at 70% 60%, rgba(25,227,210,0.35), transparent 55%), linear-gradient(135deg, #150b28, #07121e); background-size: 140% 140%; animation: shift 9s ease infinite; }
+.featcard { background: #14141d; border: 1px solid #24243a; border-radius: 12px; padding: 16px; clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%); transition: 0.22s; }
+.featcard:hover { transform: translateY(-4px); border-color: rgba(162,75,255,0.5); }
+.proteaser { background: radial-gradient(circle at 15% 20%, rgba(245,185,66,0.22), transparent 55%), linear-gradient(120deg, #191207, #120f18); border: 1px solid rgba(245,185,66,0.35); clip-path: polygon(0 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%); }
+
+.livedot { width: 8px; height: 8px; border-radius: 50%; background: #ff3b5c; position: relative; display: inline-block; flex: none; }
+.livedot::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: inherit; animation: lpulse 1.6s ease-out infinite; }
+.eq { display: inline-flex; align-items: flex-end; gap: 2px; height: 12px; }
+.eq i { width: 3px; height: 40%; background: #19e3d2; border-radius: 1px; animation: eqb 0.9s ease-in-out infinite; }
+.eq i:nth-child(2) { animation-delay: 0.15s; }
+.eq i:nth-child(3) { animation-delay: 0.3s; }
+.eq i:nth-child(4) { animation-delay: 0.45s; }
+.float { animation: floaty 4s ease-in-out infinite; }
+@keyframes lpulse { 0% { transform: scale(1); opacity: 0.7; } 100% { transform: scale(2.8); opacity: 0; } }
+@keyframes eqb { 50% { height: 100%; } }
+@keyframes floaty { 50% { transform: translateY(-8px); } }

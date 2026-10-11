@@ -1,12 +1,10 @@
-/* SideRails.css - Side rails for landing page
-   Shows only when gutters >= ~220px (viewport >= ~1540px)
-   Between 1024px-1540px: subtle decorative edge only
-   Sticky positioning, max-height clamped to viewport
+/* SideRails.css - Immersive side rails for landing page
+   Visible at 1024px+ (decorative), 1280px+ (full content)
+   Neon glows, animated orbs, grid patterns, scanlines, corner brackets
 */
 
 /* ==========================================================================
    LAYOUT: Three-column grid on landing page wrapper
-   Center column stays at max-w-6xl (1152px), rails in outer columns
    ========================================================================== */
 .landing-with-rails {
   display: grid;
@@ -15,60 +13,39 @@
   width: 100%;
 }
 
-/* Rails live in the outer grid columns */
 .rail-wrapper {
   position: relative;
   z-index: 10;
-  pointer-events: none; /* decorative layer non-interactive; content re-enables */
   min-height: 100vh;
+  overflow: hidden;
 }
 
 /* ==========================================================================
    RESPONSIVE BREAKPOINTS
-   - Rails render ONLY when each gutter >= ~220px
-   - Center = 1152px (72rem), 2 * 220px = 1592px ~ 1536px (Tailwind 2xl)
-   - Below 1536px: display: none (page looks exactly as before)
-   - 1024px-1536px: decorative edge only (vertical neon line + glow)
-   - Rails width = min(260px, gutter - 24px)
-   - >= 1920px: rails fixed 260px, extra space = background
+   - 1024px (lg): Decorative edge only (neon line + glow)
+   - 1280px (xl): Full rails with content (~200px each)
+   - 1536px (2xl): Rails at 240px
+   - 1920px+: Rails at 260px max
    ========================================================================== */
 
-/* Default: hidden on all screens */
+/* Default: hidden */
 .rail-wrapper {
   display: none;
 }
 
-/* Decorative edge: 1024px (lg) to 1535px */
-@media (min-width: 64rem) and (max-width: 95.9375rem) {
+/* Decorative edge: 1024px - 1279px */
+@media (min-width: 64rem) and (max-width: 79.9375rem) {
   .rail-wrapper {
     display: block;
     width: 100%;
   }
-  .rail-content {
-    display: none;
-  }
-  .rail-decor::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    background: linear-gradient(180deg, transparent, #a24bff, #19e3d2, transparent);
-    opacity: 0.35;
-    pointer-events: none;
-  }
-  .rail-wrapper.left .rail-decor::before {
-    right: 12px;
-    box-shadow: 8px 0 24px -8px rgba(162, 75, 255, 0.25);
-  }
-  .rail-wrapper.right .rail-decor::before {
-    left: 12px;
-    box-shadow: -8px 0 24px -8px rgba(25, 227, 210, 0.25);
-  }
+  .rail-content { display: none; }
+  .rail-bg-layer { opacity: 0.4; }
+  .rail-border { opacity: 0.3; }
 }
 
-/* Full rails: >= 1536px (2xl) */
-@media (min-width: 96rem) {
+/* Full rails: >= 1280px (xl) */
+@media (min-width: 80rem) {
   .rail-wrapper {
     display: block;
   }
@@ -78,370 +55,364 @@
     position: sticky;
     top: calc(4rem + 1.5rem); /* header ~64px + 24px */
     max-height: calc(100vh - 4rem - 3rem);
-    overflow: hidden;
+    overflow-y: auto;
     padding: 1.5rem 1rem;
-    width: min(16.25rem, calc(50% - 36rem - 1.5rem)); /* min(260px, gutter - 24px) */
+    width: min(15rem, calc(50% - 36rem - 1.5rem)); /* ~240px max, gutter-aware */
     margin: 0 auto;
   }
-  .rail-wrapper.left .rail-content {
-    margin-right: auto;
-  }
-  .rail-wrapper.right .rail-content {
-    margin-left: auto;
-  }
+  .rail-wrapper.left .rail-content { margin-right: auto; }
+  .rail-wrapper.right .rail-content { margin-left: auto; }
 }
 
-/* >= 1920px (120rem): rails fixed 260px, extra space background */
-@media (min-width: 120rem) {
+/* >= 1536px (2xl): wider rails */
+@media (min-width: 96rem) {
   .rail-content {
-    width: 16.25rem; /* 260px */
+    width: min(16.25rem, calc(50% - 36rem - 1.5rem)); /* 260px */
   }
 }
 
-/* Prevent horizontal scrollbar at any width */
+/* >= 1920px: fixed max width */
+@media (min-width: 120rem) {
+  .rail-content { width: 16.25rem; }
+}
+
 .landing-with-rails,
 .rail-wrapper {
   overflow-x: hidden;
 }
 
 /* ==========================================================================
-   RAIL CONTENT STYLING
+   BACKGROUND LAYERS (animated, immersive)
+   ========================================================================== */
+.rail-bg-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+/* Gradient fade from inner edge */
+.rail-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(162, 75, 255, 0.08) 30%,
+    rgba(25, 227, 210, 0.06) 50%,
+    rgba(162, 75, 255, 0.04) 70%,
+    transparent 100%
+  );
+  animation: gradient-shift 12s ease-in-out infinite alternate;
+}
+.rail-wrapper.right .rail-gradient {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(25, 227, 210, 0.08) 30%,
+    rgba(162, 75, 255, 0.06) 50%,
+    rgba(25, 227, 210, 0.04) 70%,
+    transparent 100%
+  );
+}
+@keyframes gradient-shift {
+  0% { opacity: 0.5; transform: scaleX(1); }
+  100% { opacity: 1; transform: scaleX(1.1); }
+}
+
+/* Grid pattern */
+.rail-grid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(139, 139, 167, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139, 139, 167, 0.06) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: linear-gradient(90deg, transparent, black 20%, black 80%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 20%, black 80%, transparent);
+  animation: grid-pulse 8s ease-in-out infinite alternate;
+}
+@keyframes grid-pulse {
+  0% { opacity: 0.3; }
+  100% { opacity: 0.7; }
+}
+
+/* Scanlines */
+.rail-scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.015) 0px,
+    rgba(255, 255, 255, 0.015) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  opacity: 0.6;
+  animation: scanline-move 4s linear infinite;
+}
+@keyframes scanline-move {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 12px; }
+}
+
+/* Floating orbs */
+.rail-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0;
+  animation: orb-float 20s ease-in-out infinite, orb-fade 20s ease-in-out infinite;
+  pointer-events: none;
+}
+.rail-wrapper.left .rail-orb:nth-child(1) { width: 280px; height: 280px; top: 10%; right: -80px; background: radial-gradient(circle, #a24bff, transparent 70%); animation-delay: 0s, 0s; }
+.rail-wrapper.left .rail-orb:nth-child(2) { width: 200px; height: 200px; top: 50%; right: -50px; background: radial-gradient(circle, #19e3d2, transparent 70%); animation-delay: -7s, -7s; }
+.rail-wrapper.left .rail-orb:nth-child(3) { width: 160px; height: 160px; bottom: 15%; right: -40px; background: radial-gradient(circle, #ff3b5c, transparent 70%); animation-delay: -14s, -14s; }
+.rail-wrapper.right .rail-orb:nth-child(1) { width: 280px; height: 280px; top: 15%; left: -80px; background: radial-gradient(circle, #19e3d2, transparent 70%); animation-delay: -3s, -3s; }
+.rail-wrapper.right .rail-orb:nth-child(2) { width: 200px; height: 200px; top: 55%; left: -50px; background: radial-gradient(circle, #f5b942, transparent 70%); animation-delay: -10s, -10s; }
+.rail-wrapper.right .rail-orb:nth-child(3) { width: 160px; height: 160px; bottom: 10%; left: -40px; background: radial-gradient(circle, #a24bff, transparent 70%); animation-delay: -17s, -17s; }
+@keyframes orb-float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(30px, -20px) scale(1.1); }
+  50% { transform: translate(-20px, 30px) scale(0.95); }
+  75% { transform: translate(15px, 15px) scale(1.05); }
+}
+@keyframes orb-fade {
+  0%, 100% { opacity: 0.08; }
+  50% { opacity: 0.18; }
+}
+
+/* Corner brackets on rail wrapper */
+.rail-border {
+  position: absolute;
+  inset: -1px;
+  pointer-events: none;
+  z-index: 1;
+}
+.rail-corner {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border: 2px solid;
+  opacity: 0.4;
+  animation: corner-pulse 4s ease-in-out infinite;
+}
+.rail-corner.tl { top: 20px; left: 20px; border-right: none; border-bottom: none; border-color: #a24bff; border-radius: 8px 0 0 0; }
+.rail-corner.tr { top: 20px; right: 20px; border-left: none; border-bottom: none; border-color: #19e3d2; border-radius: 0 8px 0 0; }
+.rail-corner.bl { bottom: 20px; left: 20px; border-right: none; border-top: none; border-color: #19e3d2; border-radius: 0 0 0 8px; }
+.rail-wrapper.right .rail-corner.bl { border-color: #a24bff; }
+.rail-corner.br { bottom: 20px; right: 20px; border-left: none; border-top: none; border-color: #a24bff; border-radius: 0 0 8px 0; }
+.rail-wrapper.right .rail-corner.br { border-color: #19e3d2; }
+@keyframes corner-pulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.1); }
+}
+
+/* ==========================================================================
+   CONTENT STYLING
    ========================================================================== */
 .rail-section {
   margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 2;
 }
-
-.rail-section:last-child {
-  margin-bottom: 0;
-}
+.rail-section:last-child { margin-bottom: 0; }
 
 .rail-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(36, 36, 58, 0.5);
+}
+.rail-header-main { display: flex; align-items: center; gap: 0.5rem; }
+.rail-badge { flex-shrink: 0; }
+
+/* Live dot pulse */
+.rail-live-dot {
+  width: 7px; height: 7px; border-radius: 50%; background: #ff3b5c;
+  position: relative; display: inline-block; flex: none;
+}
+.rail-live-dot::after {
+  content: ""; position: absolute; inset: -2px; border-radius: 50%;
+  background: inherit; animation: rail-live-pulse 1.6s ease-out infinite;
+}
+@keyframes rail-live-pulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  70% { transform: scale(2.5); opacity: 0; }
+  100% { transform: scale(2.5); opacity: 0; }
 }
 
-/* Marquee: seamless vertical scroll */
+/* Marquee - seamless vertical scroll */
 .rail-marquee {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  animation: rail-marquee-up 30s linear infinite;
+  animation: rail-marquee-up 35s linear infinite;
   will-change: transform;
 }
-
-.rail-marquee:hover {
-  animation-play-state: paused;
-}
-
+.rail-marquee:hover { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) {
-  .rail-marquee {
-    animation: none;
-  }
+  .rail-marquee { animation: none; }
 }
-
 @keyframes rail-marquee-up {
   0% { transform: translateY(0); }
   100% { transform: translateY(-50%); }
 }
 
-/* Rail cards */
+/* Rail Cards - unified styling */
 .rail-card {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
   border: 1px solid #24243a;
-  border-radius: 10px;
-  background: #14141d;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #14141d 0%, #11111a 100%);
   clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
   text-decoration: none;
   color: inherit;
+  transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s, clip-path 0.25s;
+  position: relative;
+  min-height: 72px;
 }
-
+.rail-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+  background: linear-gradient(135deg, rgba(162, 75, 255, 0.08), rgba(25, 227, 210, 0.04));
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
 .rail-card:hover {
-  transform: translateX(4px);
-  border-color: rgba(162, 75, 255, 0.5);
-  box-shadow: 0 8px 24px -8px rgba(162, 75, 255, 0.3);
+  transform: translateX(6px);
+  border-color: rgba(162, 75, 255, 0.6);
+  box-shadow: 
+    0 12px 32px -12px rgba(162, 75, 255, 0.4),
+    0 0 0 1px rgba(162, 75, 255, 0.2);
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
 }
-
-.rail-wrapper.right .rail-card:hover {
-  transform: translateX(-4px);
-}
-
+.rail-wrapper.right .rail-card:hover { transform: translateX(-6px); }
+.rail-card:hover::before { opacity: 1; }
 .rail-card:focus-visible {
   outline: 2px solid #a24bff;
   outline-offset: 2px;
+  z-index: 10;
 }
 
-/* Alert feed rotation */
-.rail-alert-panel {
-  position: relative;
-  min-height: 5.5rem;
-  overflow: hidden;
+/* Card glow inner */
+.rail-card-glow {
+  position: absolute;
+  inset: 1px;
+  border-radius: 11px;
+  clip-path: polygon(0 0, calc(100% - 11px) 0, 100% 11px, 100% 100%, 0 100%);
+  background: linear-gradient(135deg, rgba(162, 75, 255, 0.05), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  z-index: -1;
+}
+.rail-card:hover .rail-card-glow { opacity: 1; }
+
+/* Thumbnail */
+.rail-thumb { border-radius: 8px; }
+.rail-thumb-overlay { border-radius: 8px; }
+
+/* Chevron */
+.rail-chevron { font-size: 1.2rem; font-weight: bold; padding-right: 0.5rem; }
+
+/* Event Card */
+.event-card { min-height: auto; padding: 1rem; }
+.event-glow {
+  background: linear-gradient(135deg, rgba(245, 185, 66, 0.1), transparent 60%);
+}
+.event-badge {
+  background: linear-gradient(135deg, #1a1508, #0f0d12);
+  border-color: rgba(245, 185, 66, 0.3);
 }
 
+/* Alert Feed */
+.rail-alert-panel { min-height: 80px; }
 .rail-alert {
-  position: relative;
-  padding: 0.75rem;
-  border-radius: 8px;
+  padding: 1rem;
+  border-radius: 10px;
   background: #11111a;
   border: 1px solid #24243a;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
   text-decoration: none;
   color: inherit;
+  transition: border-color 0.2s, transform 0.2s;
 }
-
-.rail-alert:focus-visible {
-  outline: 2px solid #19e3d2;
-  outline-offset: 2px;
+.rail-alert:hover {
+  border-color: rgba(25, 227, 210, 0.5);
+  transform: translateX(-4px);
 }
+.rail-wrapper.right .rail-alert:hover { transform: translateX(4px); }
+.rail-alert:focus-visible { outline: 2px solid #19e3d2; outline-offset: 2px; }
+.alert-icon { overflow: hidden; }
+.alert-icon-ring {
+  border: 2px solid;
+  animation: alert-ring 2s ease-out infinite;
+}
+@keyframes alert-ring {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .alert-icon-ring { animation: none; opacity: 0.3; }
+}
+.alert-bar { border-radius: 0 0 10px 10px; }
+@keyframes alert-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+.animate-alert-in { animation: alert-in 0.35s cubic-bezier(0.2, 1.2, 0.4, 1) both; }
 
-/* Pro card uses existing .proteaser styles */
-.rail-card.proteaser {
-  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%);
+/* Pro Card */
+.pro-card { min-height: auto; }
+.pro-glow {
+  background: linear-gradient(135deg, rgba(245, 185, 66, 0.12), transparent 60%);
+}
+.pro-card:hover {
+  border-color: rgba(245, 185, 66, 0.6);
+  box-shadow: 
+    0 12px 32px -12px rgba(245, 185, 66, 0.4),
+    0 0 0 1px rgba(245, 185, 66, 0.2);
 }
 
 /* ==========================================================================
-   DECORATIVE LAYER (aria-hidden, pointer-events: none)
-   - Faint grid pattern fading toward center
-   - Slow light pulse on inner neon line
-   - Corner brackets on cards (CSS only)
-   - Floating glow orbs (low opacity)
+   ACCESSIBILITY & REDUCED MOTION
    ========================================================================== */
-.rail-decor {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: -1;
-  overflow: hidden;
-}
-
-/* Grid pattern fading toward center */
-.rail-decor::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(rgba(139, 139, 167, 0.15) 1px, transparent 1.4px);
-  background-size: 24px 24px;
-  mask-image: linear-gradient(
-    90deg,
-    transparent,
-    rgba(0, 0, 0, 0.6) 30%,
-    rgba(0, 0, 0, 0.6) 70%,
-    transparent
-  );
-  -webkit-mask-image: linear-gradient(
-    90deg,
-    transparent,
-    rgba(0, 0, 0, 0.6) 30%,
-    rgba(0, 0, 0, 0.6) 70%,
-    transparent
-  );
-  animation: grid-fade 8s ease-in-out infinite alternate;
-}
-
-@keyframes grid-fade {
-  0% { opacity: 0.3; }
-  100% { opacity: 0.6; }
-}
-
-/* Neon vertical line on inner edge with slow pulse */
-.rail-wrapper.left .rail-decor::before,
-.rail-wrapper.right .rail-decor::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 1px;
-  background: linear-gradient(180deg, transparent 10%, #a24bff 30%, #19e3d2 70%, transparent 90%);
-  opacity: 0.5;
-  animation: neon-pulse 6s ease-in-out infinite;
-}
-
-.rail-wrapper.left .rail-decor::before {
-  right: 0;
-  box-shadow: 4px 0 16px rgba(162, 75, 255, 0.3), -4px 0 16px rgba(25, 227, 210, 0.15);
-}
-
-.rail-wrapper.right .rail-decor::before {
-  left: 0;
-  box-shadow: -4px 0 16px rgba(25, 227, 210, 0.3), 4px 0 16px rgba(162, 75, 255, 0.15);
-}
-
-@keyframes neon-pulse {
-  0%, 100% { opacity: 0.4; filter: brightness(1); }
-  50% { opacity: 0.8; filter: brightness(1.5); }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .rail-decor::after,
-  .rail-wrapper.left .rail-decor::before,
-  .rail-wrapper.right .rail-decor::before {
-    animation: none;
-  }
-}
-
-/* Floating glow orbs (very low opacity, transform/opacity only) */
-.rail-decor .glow-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(60px);
-  opacity: 0.08;
-  animation: orb-float 20s ease-in-out infinite;
-  pointer-events: none;
-}
-
-.rail-wrapper.left .glow-orb:nth-child(1) {
-  width: 200px;
-  height: 200px;
-  top: 15%;
-  right: -50px;
-  background: radial-gradient(circle, #a24bff, transparent 70%);
-  animation-delay: 0s;
-}
-
-.rail-wrapper.left .glow-orb:nth-child(2) {
-  width: 150px;
-  height: 150px;
-  bottom: 20%;
-  right: -30px;
-  background: radial-gradient(circle, #19e3d2, transparent 70%);
-  animation-delay: -7s;
-}
-
-.rail-wrapper.right .glow-orb:nth-child(1) {
-  width: 200px;
-  height: 200px;
-  top: 20%;
-  left: -50px;
-  background: radial-gradient(circle, #19e3d2, transparent 70%);
-  animation-delay: -3s;
-}
-
-.rail-wrapper.right .glow-orb:nth-child(2) {
-  width: 150px;
-  height: 150px;
-  bottom: 15%;
-  left: -30px;
-  background: radial-gradient(circle, #f5b942, transparent 70%);
-  animation-delay: -10s;
-}
-
-@keyframes orb-float {
-  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.06; }
-  25% { transform: translate(20px, -15px) scale(1.1); opacity: 0.1; }
-  50% { transform: translate(-15px, 20px) scale(0.95); opacity: 0.08; }
-  75% { transform: translate(10px, 10px) scale(1.05); opacity: 0.07; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .glow-orb {
-    animation: none;
-    opacity: 0.05;
-  }
-}
-
-/* Corner brackets on rail cards (decorative, pseudo-elements) */
-.rail-card::before,
-.rail-card::after {
-  content: "";
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  border: 1px solid rgba(162, 75, 255, 0.4);
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.rail-card::before {
-  top: -1px;
-  left: -1px;
-  border-right: none;
-  border-bottom: none;
-  border-radius: 10px 0 0 0;
-}
-
-.rail-card::after {
-  bottom: -1px;
-  right: -1px;
-  border-left: none;
-  border-top: none;
-  border-radius: 0 0 10px 0;
-}
-
-.rail-card:hover::before,
-.rail-card:hover::after {
-  opacity: 1;
-}
-
-.rail-wrapper.right .rail-card::before {
-  left: auto;
-  right: -1px;
-  border-radius: 0 10px 0 0;
-  border-left: none;
-  border-right: 1px solid rgba(25, 227, 210, 0.4);
-  border-bottom: none;
-  border-top: 1px solid rgba(25, 227, 210, 0.4);
-}
-
-.rail-wrapper.right .rail-card::after {
-  right: auto;
-  left: -1px;
-  border-radius: 0 0 0 10px;
-  border-right: none;
-  border-left: 1px solid rgba(25, 227, 210, 0.4);
-  border-top: none;
-  border-bottom: 1px solid rgba(25, 227, 210, 0.4);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .rail-card::before,
-  .rail-card::after {
-    opacity: 0.3;
-    transition: none;
-  }
-}
-
-/* Reduced motion: disable all decorative animations */
-@media (prefers-reduced-motion: reduce) {
-  .rail-marquee,
-  .rail-decor::after,
-  .rail-wrapper.left .rail-decor::before,
-  .rail-wrapper.right .rail-decor::before,
-  .glow-orb {
+  .rail-gradient, .rail-grid, .rail-scanlines, .rail-orb, .rail-corner,
+  .rail-marquee, .rail-live-dot::after, .alert-icon-ring,
+  .rail-card-glow, .rail-card::before {
     animation: none !important;
     transition: none !important;
   }
+  .rail-orb { opacity: 0.05; }
+  .rail-corner { opacity: 0.3; }
+  .rail-gradient { opacity: 0.5; }
+  .rail-grid { opacity: 0.4; }
 }
 
-/* ==========================================================================
-   ACCESSIBILITY
-   ========================================================================== */
-.rail-wrapper {
-  /* Screen readers: rails are complementary, labelled "Highlights" */
-}
-
-/* Focus styles for interactive elements inside rails */
-.rail-content a:focus-visible,
-.rail-content button:focus-visible {
-  outline: 2px solid #a24bff;
-  outline-offset: 2px;
-  z-index: 1;
-}
-
-/* High contrast mode support */
 @media (forced-colors: active) {
-  .rail-card {
-    border: 1px solid CanvasText;
-  }
-  .rail-card:hover {
-    border-color: Highlight;
-  }
-  .rail-decor::before,
-  .rail-decor::after,
-  .glow-orb {
-    display: none;
-  }
+  .rail-gradient, .rail-grid, .rail-scanlines, .rail-orb, .rail-corner,
+  .rail-card-glow, .rail-card::before, .alert-icon-ring,
+  .event-glow, .pro-glow { display: none; }
+  .rail-card { border: 1px solid CanvasText; }
+  .rail-card:hover { border-color: Highlight; }
 }
+
+/* Scrollbar styling for rail content */
+.rail-content::-webkit-scrollbar { width: 6px; }
+.rail-content::-webkit-scrollbar-track { background: transparent; }
+.rail-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #a24bff, #19e3d2);
+  border-radius: 3px;
+}
+.rail-content::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #b76bff, #2ae8d8); }

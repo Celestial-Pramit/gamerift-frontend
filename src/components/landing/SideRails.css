@@ -1,0 +1,447 @@
+/* SideRails.css - Side rails for landing page
+   Shows only when gutters >= ~220px (viewport >= ~1540px)
+   Between 1024px-1540px: subtle decorative edge only
+   Sticky positioning, max-height clamped to viewport
+*/
+
+/* ==========================================================================
+   LAYOUT: Three-column grid on landing page wrapper
+   Center column stays at max-w-6xl (1152px), rails in outer columns
+   ========================================================================== */
+.landing-with-rails {
+  display: grid;
+  grid-template-columns: 1fr minmax(0, 72rem) 1fr;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Rails live in the outer grid columns */
+.rail-wrapper {
+  position: relative;
+  z-index: 10;
+  pointer-events: none; /* decorative layer non-interactive; content re-enables */
+  min-height: 100vh;
+}
+
+/* ==========================================================================
+   RESPONSIVE BREAKPOINTS
+   - Rails render ONLY when each gutter >= ~220px
+   - Center = 1152px (72rem), 2 * 220px = 1592px ~ 1536px (Tailwind 2xl)
+   - Below 1536px: display: none (page looks exactly as before)
+   - 1024px-1536px: decorative edge only (vertical neon line + glow)
+   - Rails width = min(260px, gutter - 24px)
+   - >= 1920px: rails fixed 260px, extra space = background
+   ========================================================================== */
+
+/* Default: hidden on all screens */
+.rail-wrapper {
+  display: none;
+}
+
+/* Decorative edge: 1024px (lg) to 1535px */
+@media (min-width: 64rem) and (max-width: 95.9375rem) {
+  .rail-wrapper {
+    display: block;
+    width: 100%;
+  }
+  .rail-content {
+    display: none;
+  }
+  .rail-decor::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(180deg, transparent, #a24bff, #19e3d2, transparent);
+    opacity: 0.35;
+    pointer-events: none;
+  }
+  .rail-wrapper.left .rail-decor::before {
+    right: 12px;
+    box-shadow: 8px 0 24px -8px rgba(162, 75, 255, 0.25);
+  }
+  .rail-wrapper.right .rail-decor::before {
+    left: 12px;
+    box-shadow: -8px 0 24px -8px rgba(25, 227, 210, 0.25);
+  }
+}
+
+/* Full rails: >= 1536px (2xl) */
+@media (min-width: 96rem) {
+  .rail-wrapper {
+    display: block;
+  }
+  .rail-content {
+    display: block;
+    pointer-events: auto;
+    position: sticky;
+    top: calc(4rem + 1.5rem); /* header ~64px + 24px */
+    max-height: calc(100vh - 4rem - 3rem);
+    overflow: hidden;
+    padding: 1.5rem 1rem;
+    width: min(16.25rem, calc(50% - 36rem - 1.5rem)); /* min(260px, gutter - 24px) */
+    margin: 0 auto;
+  }
+  .rail-wrapper.left .rail-content {
+    margin-right: auto;
+  }
+  .rail-wrapper.right .rail-content {
+    margin-left: auto;
+  }
+}
+
+/* >= 1920px (120rem): rails fixed 260px, extra space background */
+@media (min-width: 120rem) {
+  .rail-content {
+    width: 16.25rem; /* 260px */
+  }
+}
+
+/* Prevent horizontal scrollbar at any width */
+.landing-with-rails,
+.rail-wrapper {
+  overflow-x: hidden;
+}
+
+/* ==========================================================================
+   RAIL CONTENT STYLING
+   ========================================================================== */
+.rail-section {
+  margin-bottom: 1.5rem;
+}
+
+.rail-section:last-child {
+  margin-bottom: 0;
+}
+
+.rail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+/* Marquee: seamless vertical scroll */
+.rail-marquee {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  animation: rail-marquee-up 30s linear infinite;
+  will-change: transform;
+}
+
+.rail-marquee:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rail-marquee {
+    animation: none;
+  }
+}
+
+@keyframes rail-marquee-up {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+
+/* Rail cards */
+.rail-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  border: 1px solid #24243a;
+  border-radius: 10px;
+  background: #14141d;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+  text-decoration: none;
+  color: inherit;
+}
+
+.rail-card:hover {
+  transform: translateX(4px);
+  border-color: rgba(162, 75, 255, 0.5);
+  box-shadow: 0 8px 24px -8px rgba(162, 75, 255, 0.3);
+}
+
+.rail-wrapper.right .rail-card:hover {
+  transform: translateX(-4px);
+}
+
+.rail-card:focus-visible {
+  outline: 2px solid #a24bff;
+  outline-offset: 2px;
+}
+
+/* Alert feed rotation */
+.rail-alert-panel {
+  position: relative;
+  min-height: 5.5rem;
+  overflow: hidden;
+}
+
+.rail-alert {
+  position: relative;
+  padding: 0.75rem;
+  border-radius: 8px;
+  background: #11111a;
+  border: 1px solid #24243a;
+  text-decoration: none;
+  color: inherit;
+}
+
+.rail-alert:focus-visible {
+  outline: 2px solid #19e3d2;
+  outline-offset: 2px;
+}
+
+/* Pro card uses existing .proteaser styles */
+.rail-card.proteaser {
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%);
+}
+
+/* ==========================================================================
+   DECORATIVE LAYER (aria-hidden, pointer-events: none)
+   - Faint grid pattern fading toward center
+   - Slow light pulse on inner neon line
+   - Corner brackets on cards (CSS only)
+   - Floating glow orbs (low opacity)
+   ========================================================================== */
+.rail-decor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  overflow: hidden;
+}
+
+/* Grid pattern fading toward center */
+.rail-decor::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(139, 139, 167, 0.15) 1px, transparent 1.4px);
+  background-size: 24px 24px;
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 0, 0, 0.6) 30%,
+    rgba(0, 0, 0, 0.6) 70%,
+    transparent
+  );
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 0, 0, 0.6) 30%,
+    rgba(0, 0, 0, 0.6) 70%,
+    transparent
+  );
+  animation: grid-fade 8s ease-in-out infinite alternate;
+}
+
+@keyframes grid-fade {
+  0% { opacity: 0.3; }
+  100% { opacity: 0.6; }
+}
+
+/* Neon vertical line on inner edge with slow pulse */
+.rail-wrapper.left .rail-decor::before,
+.rail-wrapper.right .rail-decor::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(180deg, transparent 10%, #a24bff 30%, #19e3d2 70%, transparent 90%);
+  opacity: 0.5;
+  animation: neon-pulse 6s ease-in-out infinite;
+}
+
+.rail-wrapper.left .rail-decor::before {
+  right: 0;
+  box-shadow: 4px 0 16px rgba(162, 75, 255, 0.3), -4px 0 16px rgba(25, 227, 210, 0.15);
+}
+
+.rail-wrapper.right .rail-decor::before {
+  left: 0;
+  box-shadow: -4px 0 16px rgba(25, 227, 210, 0.3), 4px 0 16px rgba(162, 75, 255, 0.15);
+}
+
+@keyframes neon-pulse {
+  0%, 100% { opacity: 0.4; filter: brightness(1); }
+  50% { opacity: 0.8; filter: brightness(1.5); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rail-decor::after,
+  .rail-wrapper.left .rail-decor::before,
+  .rail-wrapper.right .rail-decor::before {
+    animation: none;
+  }
+}
+
+/* Floating glow orbs (very low opacity, transform/opacity only) */
+.rail-decor .glow-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.08;
+  animation: orb-float 20s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.rail-wrapper.left .glow-orb:nth-child(1) {
+  width: 200px;
+  height: 200px;
+  top: 15%;
+  right: -50px;
+  background: radial-gradient(circle, #a24bff, transparent 70%);
+  animation-delay: 0s;
+}
+
+.rail-wrapper.left .glow-orb:nth-child(2) {
+  width: 150px;
+  height: 150px;
+  bottom: 20%;
+  right: -30px;
+  background: radial-gradient(circle, #19e3d2, transparent 70%);
+  animation-delay: -7s;
+}
+
+.rail-wrapper.right .glow-orb:nth-child(1) {
+  width: 200px;
+  height: 200px;
+  top: 20%;
+  left: -50px;
+  background: radial-gradient(circle, #19e3d2, transparent 70%);
+  animation-delay: -3s;
+}
+
+.rail-wrapper.right .glow-orb:nth-child(2) {
+  width: 150px;
+  height: 150px;
+  bottom: 15%;
+  left: -30px;
+  background: radial-gradient(circle, #f5b942, transparent 70%);
+  animation-delay: -10s;
+}
+
+@keyframes orb-float {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.06; }
+  25% { transform: translate(20px, -15px) scale(1.1); opacity: 0.1; }
+  50% { transform: translate(-15px, 20px) scale(0.95); opacity: 0.08; }
+  75% { transform: translate(10px, 10px) scale(1.05); opacity: 0.07; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glow-orb {
+    animation: none;
+    opacity: 0.05;
+  }
+}
+
+/* Corner brackets on rail cards (decorative, pseudo-elements) */
+.rail-card::before,
+.rail-card::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 1px solid rgba(162, 75, 255, 0.4);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.rail-card::before {
+  top: -1px;
+  left: -1px;
+  border-right: none;
+  border-bottom: none;
+  border-radius: 10px 0 0 0;
+}
+
+.rail-card::after {
+  bottom: -1px;
+  right: -1px;
+  border-left: none;
+  border-top: none;
+  border-radius: 0 0 10px 0;
+}
+
+.rail-card:hover::before,
+.rail-card:hover::after {
+  opacity: 1;
+}
+
+.rail-wrapper.right .rail-card::before {
+  left: auto;
+  right: -1px;
+  border-radius: 0 10px 0 0;
+  border-left: none;
+  border-right: 1px solid rgba(25, 227, 210, 0.4);
+  border-bottom: none;
+  border-top: 1px solid rgba(25, 227, 210, 0.4);
+}
+
+.rail-wrapper.right .rail-card::after {
+  right: auto;
+  left: -1px;
+  border-radius: 0 0 0 10px;
+  border-right: none;
+  border-left: 1px solid rgba(25, 227, 210, 0.4);
+  border-top: none;
+  border-bottom: 1px solid rgba(25, 227, 210, 0.4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rail-card::before,
+  .rail-card::after {
+    opacity: 0.3;
+    transition: none;
+  }
+}
+
+/* Reduced motion: disable all decorative animations */
+@media (prefers-reduced-motion: reduce) {
+  .rail-marquee,
+  .rail-decor::after,
+  .rail-wrapper.left .rail-decor::before,
+  .rail-wrapper.right .rail-decor::before,
+  .glow-orb {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ==========================================================================
+   ACCESSIBILITY
+   ========================================================================== */
+.rail-wrapper {
+  /* Screen readers: rails are complementary, labelled "Highlights" */
+}
+
+/* Focus styles for interactive elements inside rails */
+.rail-content a:focus-visible,
+.rail-content button:focus-visible {
+  outline: 2px solid #a24bff;
+  outline-offset: 2px;
+  z-index: 1;
+}
+
+/* High contrast mode support */
+@media (forced-colors: active) {
+  .rail-card {
+    border: 1px solid CanvasText;
+  }
+  .rail-card:hover {
+    border-color: Highlight;
+  }
+  .rail-decor::before,
+  .rail-decor::after,
+  .glow-orb {
+    display: none;
+  }
+}

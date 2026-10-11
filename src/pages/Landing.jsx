@@ -7,6 +7,9 @@ import StreamCard from "../components/StreamCard.jsx";
 import useNow from "../hooks/useNow.js";
 import { streams, events, countdown } from "../mock/mockData.js";
 import { getPublicStats } from "../api/statsApi.js";
+import { SideRail } from "../components/landing/SideRails.jsx";
+import RiftGuide from "../components/landing/RiftGuide.jsx";
+import "../components/landing/SideRails.css";
 
 const features = [
   { icon: "play", title: "Watch live", text: "From the dashboard to a looping player in one click.", color: "#a24bff" },
@@ -89,8 +92,11 @@ export default function Landing() {
         </div>
       </header>
 
-      {/* Hero */}
-      <section className="mx-auto max-w-6xl px-4 pb-10 pt-10 sm:px-6 sm:pt-12">
+      <div className="landing-with-rails">
+        <SideRail side="left" />
+        <main className="center-column min-w-0">
+          {/* Hero */}
+          <section className="mx-auto max-w-6xl px-4 pb-10 pt-10 sm:px-6 sm:pt-12">
         <div className="gradborder scan relative overflow-hidden rounded-2xl p-6 sm:p-8 md:p-12">
           <div className="relative z-10 grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
             <div>
@@ -184,6 +190,12 @@ export default function Landing() {
       <section className="mx-auto max-w-6xl px-4 pb-14 sm:px-6">
         <Reveal className="gradborder scan relative overflow-hidden rounded-2xl p-8 text-center sm:p-12"><div className="relative z-10"><h2 className="font-display text-3xl font-black sm:text-5xl">READY TO <span className="gradtext">ENTER THE RIFT?</span></h2><p className="mx-auto mt-3 max-w-md text-muted">Free to join. Your first stream is one click away.</p><Link to="/register" className="btn-cut btn-pri mt-6 px-8 py-3.5 text-base">Create free account</Link></div></Reveal>
       </section>
+
+        </main>
+        <SideRail side="right" />
+      </div>
+
+      <RiftGuide />
 
       <footer className="border-t border-line bg-[#0b0b11]">
         <div className="mx-auto grid max-w-6xl gap-6 px-4 py-8 text-sm sm:grid-cols-2 sm:px-6 lg:grid-cols-4">

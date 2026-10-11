@@ -221,7 +221,7 @@ export default function Admin() {
       </div>
       <nav className="flex flex-wrap gap-2">
         {sections.map(([key, label]) => (
-          <Link key={key} to={"/app/admin/" + key} aria-current={section === key ? "page" : undefined} className={"rounded-lg border px-3 py-1 font-head text-sm font-bold sm:px-4 sm:py-1.5 sm:text-base text-white " + (section === key ? "border-brand bg-brand/20" : "border-line")}>{label}</Link>
+          <Link key={key} to={"/app/admin/" + key} aria-current={section === key ? "page" : undefined} className={"rounded-lg border px-3 py-1 font-head text-sm font-bold sm:px-4 sm:py-1.5 sm:text-[1rem] text-white " + (section === key ? "border-brand bg-brand/20" : "border-line")}>{label}</Link>
         ))}
       </nav>
       {section === "overview" && <Overview data={data} stats={stats} />}

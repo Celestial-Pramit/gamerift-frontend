@@ -63,7 +63,7 @@ export default function Events() {
       <div className="panel flex flex-wrap items-center justify-between gap-3 p-3">
         <div className="no-scrollbar flex max-w-full overflow-x-auto rounded-lg border border-line bg-card p-1">
           {tabs.map(([key, label]) => (
-            <button key={key} onClick={() => setTab(key)} className={"shrink-0 rounded-md px-4 py-1.5 font-head text-base font-bold " + (tab === key ? "bg-brand text-white" : "text-muted hover:text-white")}>
+            <button key={key} onClick={() => setTab(key)} className={"shrink-0 rounded-md px-4 py-1.5 font-head font-bold " + (tab === key ? "bg-brand text-white" : "text-muted hover:text-white")}>
               {label}{key === "reminders" && " (" + remindedCount + ")"}
             </button>
           ))}

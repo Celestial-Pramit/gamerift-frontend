@@ -141,7 +141,7 @@ export default function Discover() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex rounded-lg border border-line bg-card p-1">
             {["live", "trending", "new"].map((t) => (
-              <button key={t} onClick={() => setTab(t)} className={"rounded-md px-4 py-1.5 font-head text-base font-bold capitalize " + (tab === t ? "bg-brand text-white" : "text-muted hover:text-white")}>{t}</button>
+              <button key={t} onClick={() => setTab(t)} className={"rounded-md px-4 py-1.5 font-head font-bold capitalize " + (tab === t ? "bg-brand text-white" : "text-muted hover:text-white")}>{t}</button>
             ))}
           </div>
           <div className="flex rounded-lg border border-line bg-card p-1">

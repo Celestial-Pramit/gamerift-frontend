@@ -86,7 +86,7 @@ function Chat({ open, onClose, onActivity }) {
     onActivity(true, { user: user?.username || "you", text });
   }
 
-  const size = ["text-xs space-y-1", "text-sm space-y-2", "text-base space-y-3"][density];
+  const size = ["text-xs space-y-1", "text-sm space-y-2", " space-y-3"][density];
 
   return (
     <aside className={(open ? "slideup fixed inset-x-0 bottom-0 z-50 flex h-[75vh] max-h-[640px] rounded-t-2xl " : "hidden ") + "panel flex-col lg:sticky lg:inset-x-auto lg:bottom-auto lg:top-20 lg:z-10 lg:max-h-none lg:flex lg:h-[calc(100vh-6.5rem)] lg:rounded-xl"}>

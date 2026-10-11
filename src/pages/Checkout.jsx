@@ -154,7 +154,7 @@ export default function Checkout() {
           </div>
           <div className="rounded-lg border border-neon/40 bg-neon/5 p-3 text-xs text-neon">Sandbox mode is on — you will be redirected to SSLCommerz. No real money moves.</div>
           <label className="flex items-start gap-2 text-sm text-muted"><input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-1 accent-[#a24bff]" />By paying you agree to the Terms of Service and Refund Policy. Pro is a one-time pass, not a subscription.</label>
-          <button disabled={!agree || left === 0 || redirecting} onClick={pay} className="btn-cut btn-pri w-full py-3.5 text-base disabled:opacity-40">{left === 0 ? "Order expired" : "Pay ৳" + (applied ? price.total : plan.price) + " securely"}</button>
+          <button disabled={!agree || left === 0 || redirecting} onClick={pay} className="btn-cut btn-pri w-full py-3.5 disabled:opacity-40">{left === 0 ? "Order expired" : "Pay ৳" + (applied ? price.total : plan.price) + " securely"}</button>
           <Link to="/app/pro" className="mono block text-center text-[10px] text-muted hover:text-white">Back to plans</Link>
           <div className="flex items-center justify-between border-t border-line pt-3">
             <span className="flex items-center gap-1.5 text-[10px] text-muted">🔒 Secured by SSLCommerz · PCI-DSS</span>

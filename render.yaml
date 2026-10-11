@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: gamerift-pramit-web
+    name: gamerift-web
     runtime: static
     buildCommand: npm ci && npm run build
     staticPublishPath: dist
@@ -16,4 +16,4 @@ services:
       - key: VITE_MOCK_OTP
         value: "false"
       - key: VITE_API_URL
-        value: https://gamerift-pramit-api.onrender.com/api
+        value: https://gamerift-api.onrender.com/api

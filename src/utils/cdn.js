@@ -23,3 +23,18 @@ export async function alertBox(options) {
     window.alert(options.text || options.title);
   }
 }
+
+// Loads an ES module script (used for the emoji picker web component)
+export function loadModule(url) {
+  if (!loaded[url]) {
+    loaded[url] = new Promise((resolve, reject) => {
+      const s = document.createElement("script");
+      s.type = "module";
+      s.src = url;
+      s.onload = resolve;
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+  return loaded[url];
+}

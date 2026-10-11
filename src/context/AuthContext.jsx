@@ -16,13 +16,20 @@ export function AuthProvider({ children }) {
     setUser(data.user);
   }
 
+  // Change a few fields of the logged-in user (bio, isPro, 2FA ...)
+  function updateUser(patch) {
+    const next = { ...user, ...patch };
+    localStorage.setItem("gr_user", JSON.stringify(next));
+    setUser(next);
+  }
+
   function logout() {
     localStorage.removeItem("gr_token");
     localStorage.removeItem("gr_user");
     setUser(null);
   }
 
-  return <AuthContext.Provider value={{ user, saveLogin, logout }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user, saveLogin, updateUser, logout }}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

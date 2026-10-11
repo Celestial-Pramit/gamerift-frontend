@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
+import Brand from "./Brand.jsx";
 
 // Split screen: neon artwork on the left, glowing form card on the right
 export default function AuthLayout({ title, subtitle, children }) {
   return (
     <div className="grid min-h-screen lg:grid-cols-[1.1fr_0.9fr]">
       <div className="landing-bg scan relative hidden flex-col justify-between overflow-hidden p-10 lg:flex">
-        <Link to="/" className="glitch relative z-10 font-display text-2xl font-black">GAMERIFT</Link>
+        <Link to="/" className="relative z-10"><Brand className="text-2xl" /></Link>
         <div className="relative z-10">
           <p className="font-display text-5xl font-black leading-tight">
             ENTER THE <span className="gradtext">RIFT.</span>

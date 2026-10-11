@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: gamerift-pramit-web
+    runtime: static
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: VITE_USE_MOCK
+        value: "false"
+      - key: VITE_MOCK_OTP
+        value: "false"
+      - key: VITE_API_URL
+        value: https://gamerift-pramit-api.onrender.com/api

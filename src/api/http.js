@@ -12,12 +12,14 @@ http.interceptors.request.use((config) => {
   return config;
 });
 
-// One helper for all real calls: returns data or throws an Error with a message
+// One helper for all real calls: returns data or throws an Error with a readable message
 export async function call(method, url, body) {
   try {
     const res = await http({ method, url, data: body });
     return res.data;
   } catch (err) {
-    throw new Error(err.response?.data?.message || "Something went wrong");
+    const data = err.response?.data;
+    const fields = data && data.fieldErrors ? Object.values(data.fieldErrors).join(". ") : "";
+    throw new Error(fields || data?.message || "Something went wrong");
   }
 }

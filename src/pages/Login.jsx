@@ -34,7 +34,12 @@ export default function Login() {
         navigate("/app");
       }
     } catch (err) {
-      setError(err.message);
+      // The e-mail is not verified yet: the backend sent a new code, so go to the OTP page
+      if (err.message.toLowerCase().includes("not verified")) {
+        navigate("/verify-otp", { state: { email } });
+      } else {
+        setError(err.message);
+      }
     }
     setLoading(false);
   }

@@ -38,72 +38,92 @@ export function NotifProvider({ children }) {
   const [list, setList] = useState(useMock ? seed : []);
   const [toasts, setToasts] = useState([]);
   const [socketConnected, setSocketConnected] = useState(false);
+  const socketConnectedRef = useRef(false);
   const clientRef = useRef(null);
-  const first = useRef(true); // real mode: do not toast the initial load
+  const first = useRef(true);
   const real = !useMock;
+  const userIdRef = useRef(user?.id ?? null);
+  const mountedRef = useRef(false);
+
+  // Stable refs for callbacks so the socket effect doesn't re-run when they change
+  const getTokenRef = useRef(() => localStorage.getItem("gr_token"));
+  const dismissRef = useRef((id) => {
+    setToasts((t) => t.filter((x) => x.id !== id));
+  });
+  const onNotificationRef = useRef((n) => {
+    setList((prev) => {
+      if (prev.some((x) => String(x.id) === String(n.id))) return prev;
+      return [n, ...prev];
+    });
+    setToasts((t) => [...t, n].slice(-3));
+    setTimeout(() => dismissRef.current(n.id), 4500);
+  });
+  const onConnectedRef = useRef(() => {
+    setSocketConnected(true);
+    socketConnectedRef.current = true;
+    loadRestRef.current();
+  });
+  const onDisconnectedRef = useRef(() => {
+    setSocketConnected(false);
+    socketConnectedRef.current = false;
+  });
+
+  const loadRestRef = useRef(async () => {
+    try {
+      const rows = await fetchNotifications();
+      setList((prev) => {
+        if (first.current) {
+          first.current = false;
+          return rows;
+        }
+        const seen = new Set(prev.map((n) => String(n.id)));
+        const fresh = rows.filter((n) => !seen.has(String(n.id)) && !n.read);
+        if (fresh.length) setToasts((t) => [...t, ...fresh.slice(-3)].slice(-3));
+        return rows;
+      });
+    } catch (_) {}
+  });
 
   function dismiss(id) {
-    setToasts((t) => t.filter((x) => x.id !== id));
+    dismissRef.current(id);
   }
 
-  // Mock-only: simulated arrivals (REMOVED - no interval in mock mode)
-
   useEffect(() => {
-    // Mock mode: use seeded data only, no intervals, no socket
-    if (!real) {
+    if (!real) return;
+
+    if (!user) {
+      // Logout: clear list and disconnect
+      if (clientRef.current) {
+        clientRef.current.deactivate();
+        clientRef.current = null;
+      }
+      setList([]);
+      first.current = true;
+      mountedRef.current = false;
+      userIdRef.current = null;
       return;
     }
 
-    // Real mode: start from empty, load once on connect, fallback poll only while disconnected
+    // Only (re)connect when user id actually changes
+    if (userIdRef.current === user.id && mountedRef.current) return;
+    userIdRef.current = user.id;
+
+    // First load for this user
     first.current = true;
-    setList([]);
-    if (!user) return;
+    mountedRef.current = true;
 
-    const getToken = () => localStorage.getItem("gr_token");
-
-    const loadRest = async () => {
-      try {
-        const rows = await fetchNotifications();
-        setList((prev) => {
-          if (first.current) {
-            first.current = false;
-            return rows;
-          }
-          const seen = new Set(prev.map((n) => String(n.id)));
-          const fresh = rows.filter((n) => !seen.has(String(n.id)) && !n.read);
-          if (fresh.length) setToasts((t) => [...t, ...fresh.slice(-3)].slice(-3));
-          return rows;
-        });
-      } catch (_) {}
-    };
-
-    // Create STOMP socket
     const client = createNotifSocket({
-      getToken,
-      onNotification: (n) => {
-        // Deduplicate: if already in list, ignore
-        setList((prev) => {
-          if (prev.some((x) => String(x.id) === String(n.id))) return prev;
-          return [n, ...prev];
-        });
-        setToasts((t) => [...t, n].slice(-3));
-        setTimeout(() => dismiss(n.id), 4500);
-      },
-      onConnected: () => {
-        setSocketConnected(true);
-        // Refetch REST list once on connect (catches anything missed while offline)
-        loadRest();
-      },
-      onDisconnected: () => {
-        setSocketConnected(false);
-      },
+      getToken: getTokenRef.current,
+      onNotification: onNotificationRef.current,
+      onConnected: onConnectedRef.current,
+      onDisconnected: onDisconnectedRef.current,
     });
     clientRef.current = client;
     client.activate();
 
-    // Fallback poll: only runs while socket is disconnected (slow 60s interval)
+    // Fallback poll: only while disconnected
     const pollTimer = setInterval(() => {
-      if (!socketConnected && user) loadRest();
+      if (!socketConnectedRef.current && user) loadRestRef.current();
     }, 60000);
 
     return () => {
@@ -113,7 +133,7 @@ export function NotifProvider({ children }) {
         clientRef.current = null;
       }
     };
-  }, [real, user && user.username, socketConnected]);
+  }, [real, user?.id]);
 
   async function markOne(id) {
     if (real) {

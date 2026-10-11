@@ -219,9 +219,9 @@ export default function Admin() {
         <h1 className="font-display text-2xl font-black sm:text-3xl">ADMIN <span className="gradtext">PANEL</span></h1>
         <p className="text-sm text-muted">{real ? "Changes go straight to the database." : "Manage everything here. Changes use mock data until the backend is connected."}</p>
       </div>
-      <nav className="no-scrollbar -mx-3 flex gap-2 overflow-x-auto px-3 sm:mx-0 sm:px-0">
+      <nav className="flex flex-wrap gap-2">
         {sections.map(([key, label]) => (
-          <Link key={key} to={"/app/admin/" + key} className={"shrink-0 rounded-lg border px-4 py-1.5 font-head text-base font-bold " + (section === key ? "border-brand bg-brand/20 text-white" : "border-line text-muted hover:text-white")}>{label}</Link>
+          <Link key={key} to={"/app/admin/" + key} aria-current={section === key ? "page" : undefined} className={"rounded-lg border px-3 py-1 font-head text-sm font-bold sm:px-4 sm:py-1.5 sm:text-base " + (section === key ? "border-brand bg-brand/20 text-white" : "border-line text-muted hover:text-white")}>{label}</Link>
         ))}
       </nav>
       {section === "overview" && <Overview data={data} stats={stats} />}

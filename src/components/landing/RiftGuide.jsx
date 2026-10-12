@@ -99,7 +99,6 @@ export default function RiftGuide() {
   const [showAllChips, setShowAllChips] = useState(false);
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const [firstVisit, setFirstVisit] = useState(true);
-  const [launcherHover, setLauncherHover] = useState(false);
 
   const panelRef = useRef(null);
   const messagesEndRef = useRef(null);
@@ -108,15 +107,24 @@ export default function RiftGuide() {
 
   const reducedMotion = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  // Tooltip after 4s on first visit
+  // Listen for external open event
   useEffect(() => {
-    if (!firstVisit) return;
+    function onOpen() {
+      openPanel();
+    }
+    window.addEventListener("rift-guide:open", onOpen);
+    return () => window.removeEventListener("rift-guide:open", onOpen);
+  }, []);
+
+  // Tooltip after 4s on first visit (only if never opened)
+  useEffect(() => {
+    if (!firstVisit || open) return;
     const timer = setTimeout(() => {
       setTooltipVisible(true);
       setFirstVisit(false);
     }, 4000);
     return () => clearTimeout(timer);
-  }, [firstVisit]);
+  }, [firstVisit, open]);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -162,10 +170,8 @@ export default function RiftGuide() {
     const q = QUESTION_MAP[questionId];
     if (!q) return;
 
-    // Add user question bubble
     setMessages((prev) => [...prev, { id: `user-${Date.now()}`, type: "user", content: q.question }]);
 
-    // Remove the last chips message
     setMessages((prev) => {
       const idx = prev.findLastIndex((m) => m.type === "chips");
       if (idx >= 0) {
@@ -176,7 +182,6 @@ export default function RiftGuide() {
       return prev;
     });
 
-    // Typing indicator then answer
     const typingId = `typing-${Date.now()}`;
     setMessages((prev) => [...prev, { id: typingId, type: "typing" }]);
 
@@ -218,22 +223,22 @@ export default function RiftGuide() {
     <>
       <style jsx>{`
         /* ==========================================================================
-           RIFT GUIDE - Immersive Chat Widget
+           RIFT GUIDE - Immersive Chat Widget (Panel + Launcher)
            ========================================================================== */
 
         /* Launcher */
         .rift-launcher {
           position: fixed;
-          bottom: calc(4rem + 16px);
-          right: 1rem;
+          bottom: calc(4rem + 16px + env(safe-area-inset-bottom));
+          right: 16px;
           z-index: 40;
           display: flex;
           align-items: center;
-          gap: 0.75rem;
-          padding: 0.875rem 1.25rem;
+          gap: 0.5rem;
+          padding: 0.625rem 1rem;
           font-family: var(--font-head);
           font-weight: 700;
-          font-size: 0.8rem;
+          font-size: 0.75rem;
           text-transform: uppercase;
           letter-spacing: 0.06em;
           color: #fff;
@@ -241,7 +246,7 @@ export default function RiftGuide() {
           background-size: 200% 200%;
           border: none;
           cursor: pointer;
-          clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+          clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
           box-shadow: 
             0 8px 32px -8px rgba(162, 75, 255, 0.5),
             0 0 0 1px rgba(162, 75, 255, 0.3),
@@ -255,7 +260,7 @@ export default function RiftGuide() {
             0 12px 40px -10px rgba(162, 75, 255, 0.7),
             0 0 0 1px rgba(162, 75, 255, 0.5),
             inset 0 1px 0 rgba(255, 255, 255, 0.15);
-          clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%);
+          clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
         }
         .rift-launcher:focus-visible {
           outline: 2px solid #19e3d2;
@@ -281,12 +286,33 @@ export default function RiftGuide() {
           0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 12px #fff, 0 0 24px #ff3b5c; }
           50% { transform: scale(1.3); opacity: 0.7; box-shadow: 0 0 20px #fff, 0 0 40px #ff3b5c; }
         }
+        @media (prefers-reduced-motion: reduce) {
+          .rift-launcher .livedot { animation: none; }
+        }
+
+        /* Mobile compact launcher */
+        @media (max-width: 639px) {
+          .rift-launcher {
+            padding: 0.625rem 0.875rem;
+          }
+          .rift-launcher span:last-child {
+            display: none;
+          }
+          .rift-launcher::after {
+            content: "ASK";
+            font-family: var(--font-head);
+            font-weight: 700;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+          }
+        }
 
         /* Tooltip */
         .rift-tooltip {
           position: fixed;
-          bottom: calc(4rem + 16px);
-          right: calc(100% + 1rem);
+          bottom: calc(4rem + 16px + 48px + env(safe-area-inset-bottom));
+          right: 16px;
           z-index: 39;
           padding: 0.75rem 1rem;
           font-size: 0.8rem;
@@ -301,18 +327,6 @@ export default function RiftGuide() {
         @keyframes tooltip-in {
           from { opacity: 0; transform: translateX(16px); }
           to { opacity: 1; transform: none; }
-        }
-        .rift-tooltip::after {
-          content: "";
-          position: absolute;
-          top: 50%;
-          right: -8px;
-          transform: translateY(-50%);
-          width: 0; height: 0;
-          border-left: 8px solid #a24bff;
-          border-top: 8px solid transparent;
-          border-bottom: 8px solid transparent;
-          filter: drop-shadow(2px 0 4px rgba(162, 75, 255, 0.4));
         }
 
         /* Panel */
@@ -343,7 +357,6 @@ export default function RiftGuide() {
           .rift-panel { animation: none; }
         }
 
-        /* Panel background layers */
         .rift-panel::before {
           content: "";
           position: absolute;
@@ -370,7 +383,6 @@ export default function RiftGuide() {
           min-height: 0;
         }
 
-        /* Header */
         .rift-header {
           display: flex;
           align-items: center;
@@ -447,7 +459,6 @@ export default function RiftGuide() {
           transform: rotate(90deg);
         }
 
-        /* Messages area */
         .rift-messages {
           flex: 1;
           min-height: 0;
@@ -464,7 +475,6 @@ export default function RiftGuide() {
           border-radius: 3px;
         }
 
-        /* Bubbles */
         .rift-bubble {
           position: relative;
           max-width: 88%;
@@ -542,7 +552,6 @@ export default function RiftGuide() {
           font-weight: 500;
         }
 
-        /* Typing indicator */
         .rift-typing {
           display: flex;
           align-items: center;
@@ -567,7 +576,6 @@ export default function RiftGuide() {
           .rift-typing-dot { animation: none; opacity: 0.6; transform: none; }
         }
 
-        /* Answer content */
         .rift-answer { color: #e8e8ef; line-height: 1.6; }
         .rift-paragraph {
           margin: 0 0 0.6rem;
@@ -598,7 +606,6 @@ export default function RiftGuide() {
           to { opacity: 1; transform: none; }
         }
 
-        /* Chips */
         .rift-chip-row {
           display: flex;
           flex-wrap: wrap;
@@ -663,7 +670,6 @@ export default function RiftGuide() {
 
         .rift-chips-container { display: flex; flex-direction: column; gap: 0.5rem; }
 
-        /* Hint */
         .rift-hint {
           flex-shrink: 0;
           padding: 0.75rem 1.25rem;
@@ -679,7 +685,6 @@ export default function RiftGuide() {
           text-align: center;
         }
 
-        /* Mobile bottom sheet */
         @media (max-width: 639px) {
           .rift-panel {
             left: env(safe-area-inset-left);
@@ -702,6 +707,8 @@ export default function RiftGuide() {
             border-radius: 16px 16px 0 0;
             clip-path: none;
           }
+          .rift-launcher::after { display: none; }
+          .rift-launcher span:last-child { display: inline; }
           .rift-tooltip {
             left: env(safe-area-inset-left);
             right: env(safe-area-inset-right);
@@ -709,7 +716,6 @@ export default function RiftGuide() {
             max-width: none;
             width: auto;
           }
-          .rift-tooltip::after { display: none; }
           .rift-startover { display: inline-flex; }
         }
 
@@ -717,42 +723,39 @@ export default function RiftGuide() {
           .rift-panel { width: 380px; }
         }
 
-        /* Reduced motion */
         @media (prefers-reduced-motion: reduce) {
           .rift-launcher, .rift-panel, .rift-bubble, .rift-typing-dot,
           .rift-cta, .rift-tooltip, .rift-chip, .rift-bubble-glow {
             animation: none !important;
             transition: none !important;
           }
+          .rift-launcher .livedot { animation: none; }
         }
       `}</style>
 
       {/* Launcher */}
-      <button
-        ref={launcherRef}
-        type="button"
-        onClick={openPanel}
-        onMouseEnter={() => setLauncherHover(true)}
-        onMouseLeave={() => setLauncherHover(false)}
-        className="rift-launcher"
-        aria-label="Ask the Rift"
-        aria-expanded={open}
-        aria-controls="rift-guide-panel"
-      >
-        <span className="livedot" />
-        <Icon name="message-square" size={16} />
-        <span>ASK THE RIFT</span>
-        <div className="rift-launcher-glow" aria-hidden="true" />
-      </button>
+      {!open && (
+        <button
+          ref={launcherRef}
+          type="button"
+          onClick={openPanel}
+          className="rift-launcher"
+          aria-label="Ask the Rift"
+          aria-expanded={open}
+          aria-controls="rift-guide-panel"
+        >
+          <span className="livedot" />
+          <Icon name="message-square" size={16} />
+          <span>ASK THE RIFT</span>
+        </button>
+      )}
 
       {/* Tooltip */}
       {tooltipVisible && !open && (
         <div className="rift-tooltip" role="tooltip">
-          <div className="flex items-center justify-between gap-2">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'spaceBetween', gap: '0.5rem' }}>
             <span>Ask what Gamerift can do</span>
-            <button onClick={() => setTooltipVisible(false)} className="text-muted hover:text-white p-0.5" aria-label="Dismiss">
-              <Icon name="x" size={14} />
-            </button>
+            <button onClick={() => setTooltipVisible(false)} style={{ background: 'none', border: 'none', color: '#8b8ba7', cursor: 'pointer', padding: '0.25rem', lineHeight: 1 }} aria-label="Dismiss">✕</button>
           </div>
         </div>
       )}
@@ -774,14 +777,14 @@ export default function RiftGuide() {
                 <h2>RIFT GUIDE</h2>
                 <p>Pre-written answers, not AI</p>
               </div>
-              <div className="flex items-center gap-2">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <button
                   type="button"
                   onClick={handleStartOver}
-                  className="rift-startover hidden sm:inline-flex"
+                  className="rift-startover"
                   aria-label="Start over"
                 >
-                  <Icon name="rotate-ccw" size={11} className="mr-1" />
+                  <Icon name="rotate-ccw" size={11} style={{ marginRight: '0.25rem' }} />
                   Start over
                 </button>
                 <button

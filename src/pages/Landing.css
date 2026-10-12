@@ -1,0 +1,484 @@
+/* ==========================================================================
+   LANDING PAGE - New Layout System
+   ========================================================================== */
+
+/* CSS Variables */
+:root {
+  --page-max: 1440px;
+  --page-pad: clamp(16px, 4vw, 56px);
+  --section-pad: clamp(32px, 5vw, 72px);
+  --header-h: 64px;
+}
+
+/* Page wrapper */
+.page-wrap {
+  width: min(100% - 2 * var(--page-pad), var(--page-max));
+  margin-inline: auto;
+}
+
+/* Landing root */
+.landing-root {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: clip;
+  background: var(--color-base);
+}
+
+/* ==========================================================================
+   FULL-BLEED ATMOSPHERE LAYER (behind everything)
+   ========================================================================== */
+.landing-atmosphere {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0; contain: strict;
+  background:
+    radial-gradient(circle 45vw at -8vw 50%, rgba(162, 75, 255, 0.28), transparent 70%),
+    radial-gradient(circle 45vw at 108vw 50%, rgba(25, 227, 210, 0.2), transparent 70%);
+}
+.atmosphere-glow, .atmosphere-drift { display: none; }
+.atmosphere-grid {
+  position: absolute; inset: 0; opacity: 0.5;
+  background-image:
+    linear-gradient(rgba(139, 139, 167, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139, 139, 167, 0.04) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image: linear-gradient(90deg, transparent, black 20%, black 80%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 20%, black 80%, transparent);
+}
+
+/* ==========================================================================
+   SECTION BASE STYLES
+   ========================================================================== */
+main > section {
+  padding-block: var(--section-pad);
+  position: relative;
+  z-index: 10;
+}
+
+/* Section header pattern */
+.section-header {
+  margin-bottom: clamp(32px, 5vw, 56px);
+}
+.section-label {
+  display: inline-block;
+}
+.section-header h2 {
+  line-height: 1.1;
+}
+
+/* Reveal animation */
+.rv { opacity: 0; }
+.rv.in { opacity: 1; animation: rvIn 0.5s cubic-bezier(0.2, 1, 0.3, 1) backwards; }
+@keyframes rvIn { from { opacity: 0; transform: translateY(24px); } }
+
+/* ==========================================================================
+   HERO SECTION
+   ========================================================================== */
+.hero-section {
+  min-height: 78vh;
+  display: flex;
+  align-items: center;
+  padding-block: var(--section-pad);
+}
+.hero-grid {
+  display: grid;
+  gap: clamp(32px, 6vw, 64px);
+  align-items: center;
+}
+@media (min-width: 1024px) {
+  .hero-grid {
+    grid-template-columns: 5fr 7fr;
+  }
+}
+.hero-headline {
+  font-size: clamp(2.75rem, 6.2vw, 5.75rem);
+  line-height: 0.95;
+}
+.hero-preview {
+  position: relative;
+}
+.preview-stack {
+  position: relative;
+}
+.ghost-card {
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  border: 1px solid #24243a;
+  background: linear-gradient(145deg, #14141d 0%, #11111a 100%);
+  opacity: 0.15;
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+.ghost-1 {
+  transform: rotate(-3deg) translate(-4%, 6%) scale(1.02);
+  z-index: 0;
+}
+.ghost-2 {
+  transform: rotate(2deg) translate(6%, -4%) scale(1.04);
+  z-index: -1;
+  opacity: 0.1;
+}
+.demo-art {
+  position: relative;
+  z-index: 10;
+}
+.float-chip {
+  animation: floaty 4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .float-chip { animation: none; }
+}
+
+/* ==========================================================================
+   TICKER BAND (full-bleed) - Landing page restyle
+   ========================================================================== */
+.ticker-band {
+  margin-inline: calc(50% - 50vw);
+  padding-inline: calc(50vw - 50%);
+  padding-block: 0;
+}
+.ticker-fullbleed {
+  background: var(--color-card);
+  border-top: 1px solid #24243a;
+  border-bottom: 1px solid #24243a;
+}
+
+/* ==========================================================================
+   STATS SECTION
+   ========================================================================== */
+.stats-section {
+  background: #0c0c13;
+  margin-inline: calc(50% - 50vw);
+  padding-inline: calc(50vw - 50%);
+  border-top: 1px solid #24243a;
+  border-bottom: 1px solid #24243a;
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+@media (min-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 24px 16px;
+}
+.stat-item:not(:last-child) {
+  border-right: 1px solid #24243a;
+}
+@media (max-width: 767px) {
+  .stat-item:nth-child(2n) {
+    border-right: none;
+  }
+  .stat-item:nth-child(n+3) {
+    border-top: 1px solid #24243a;
+  }
+}
+
+/* ==========================================================================
+   TRENDING SECTION
+   ========================================================================== */
+.trending-section {
+  padding-top: var(--section-pad);
+  padding-bottom: var(--section-pad);
+}
+.trending-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+@media (min-width: 640px) {
+  .trending-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 1024px) {
+  .trending-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (min-width: 1280px) {
+  .trending-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .trending-card-wrapper:first-child {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+  .trending-card-wrapper:first-child .trending-overlay {
+    padding: 16px 24px;
+    font-size: 1rem;
+  }
+}
+.trending-card-wrapper {
+  position: relative;
+  overflow: visible;
+}
+.trending-card-wrapper:first-child .demo-art,
+.trending-card-wrapper:first-child .cover {
+  aspect-ratio: 16/10;
+}
+.trending-card-wrapper > a { height: 100%; }
+.trending-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, transparent 50%, rgba(10, 10, 15, 0.9));
+  color: #fff;
+  font-family: var(--font-head);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.8rem;
+  opacity: 0;
+  transition: opacity 0.25s;
+  pointer-events: none;
+  z-index: 10;
+  padding: 12px 16px;
+  text-align: center;
+  border-radius: 12px;
+}
+.trending-card-wrapper:hover .trending-overlay {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   HOW IT WORKS
+   ========================================================================== */
+.how-section {
+  padding-top: var(--section-pad);
+  padding-bottom: var(--section-pad);
+}
+.steps-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+@media (min-width: 768px) {
+  .steps-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .step-card {
+    position: relative;
+  }
+}
+@media (max-width: 767px) {
+  .steps-grid {
+    grid-template-columns: 1fr;
+  }
+  .step-card {
+    position: relative;
+  }
+}
+
+/* ==========================================================================
+   BENTO GRID
+   ========================================================================== */
+.bento-section {
+  padding-top: var(--section-pad);
+  padding-bottom: var(--section-pad);
+}
+.bento-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+@media (min-width: 1024px) {
+  .bento-grid {
+    grid-template-columns: repeat(12, 1fr);
+  }
+  .bento-chat { grid-column: span 7; }
+  .bento-alerts { grid-column: span 5; }
+  .bento-countdown { grid-column: span 5; }
+  .bento-tiles { grid-column: span 7; }
+}
+.bento-card {
+  border-radius: 16px;
+  overflow: hidden;
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+}
+.bento-chat .panel,
+.bento-alerts .panel,
+.bento-countdown .panel,
+.bento-tiles .featcard {
+  height: 100%;
+}
+
+/* ==========================================================================
+   PRO BAND (full-bleed)
+   ========================================================================== */
+.pro-band {
+  margin-inline: calc(50% - 50vw);
+  padding-inline: calc(50vw - 50%);
+  padding-block: var(--section-pad);
+  position: relative;
+  overflow: hidden;
+}
+.pro-fullbleed {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(245, 185, 66, 0.15), transparent 50%, rgba(162, 75, 255, 0.1));
+  border-top: 1px solid rgba(245, 185, 66, 0.3);
+  border-bottom: 1px solid rgba(245, 185, 66, 0.3);
+  z-index: 0;
+}
+.pro-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+@media (min-width: 1024px) {
+  .pro-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.pro-preview {
+  background: linear-gradient(145deg, #191207, #120f18);
+  border: 1px solid rgba(245, 185, 66, 0.35);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%);
+}
+
+/* ==========================================================================
+   VOICES SECTION
+   ========================================================================== */
+.voices-section {
+  padding-top: var(--section-pad);
+  padding-bottom: var(--section-pad);
+}
+.voices-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+@media (min-width: 1024px) {
+  .voices-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ==========================================================================
+   FAQ SECTION
+   ========================================================================== */
+.faq-section {
+  padding-top: var(--section-pad);
+  padding-bottom: var(--section-pad);
+}
+.faq-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+@media (min-width: 1024px) {
+  .faq-grid {
+    grid-template-columns: 4fr 8fr;
+  }
+  .faq-sidebar {
+    position: sticky;
+    top: calc(var(--header-h) + 32px);
+    max-height: calc(100vh - var(--header-h) - 64px);
+  }
+}
+.faq-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ==========================================================================
+   FINAL CTA (full-bleed)
+   ========================================================================== */
+.cta-section {
+  margin-inline: calc(50% - 50vw);
+  padding-inline: calc(50vw - 50%);
+  padding-block: var(--section-pad);
+  position: relative;
+  overflow: hidden;
+}
+.cta-fullbleed {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 0%, rgba(162, 75, 255, 0.25), transparent 70%),
+    radial-gradient(ellipse 50% 50% at 85% 40%, rgba(25, 227, 210, 0.16), transparent 70%),
+    #08080d;
+  border-top: 1px solid rgba(162, 75, 255, 0.3);
+  border-bottom: 1px solid rgba(25, 227, 210, 0.3);
+  z-index: 0;
+}
+.cta-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* ==========================================================================
+   FOOTER
+   ========================================================================== */
+.footer-section {
+  margin-top: 0;
+}
+
+/* ==========================================================================
+   FOCUS VISIBLE & TOUCH TARGETS
+   ========================================================================== */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+summary:focus-visible {
+  outline: 2px solid #a24bff;
+  outline-offset: 2px;
+}
+
+@media (max-width: 639px) {
+  .btn-cut,
+  button,
+  [role="button"] {
+    min-height: 44px;
+  }
+}
+
+/* ==========================================================================
+   TOP BUTTON & RIFT GUIDE LAUNCHER SPACING
+   ========================================================================== */
+@media (max-width: 639px) {
+  .rift-launcher {
+    bottom: calc(env(safe-area-inset-bottom) + 4rem + 16px);
+  }
+  button[aria-label="Back to top"] {
+    bottom: calc(env(safe-area-inset-bottom) + 1rem);
+  }
+}
+@media (min-width: 640px) {
+  .rift-launcher {
+    bottom: calc(4rem + 16px);
+  }
+  button[aria-label="Back to top"] {
+    bottom: 1rem;
+  }
+}
+
+/* ==========================================================================
+   SCROLLBAR
+   ========================================================================== */
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #a24bff, #19e3d2);
+  border-radius: 4px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #b76bff, #2ae8d8);
+}

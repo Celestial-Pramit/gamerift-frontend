@@ -9,7 +9,7 @@
 // 6. NEVER claim anything not implemented. Verify every factual claim against the code.
 // 7. If a fact contradicts the existing FAQ, note it in DEVIATIONS and do NOT edit the FAQ.
 
-export const GREETING = "Hey! I'm the Rift Guide — a pre-written FAQ bot, not AI. Pick a question below and I'll give you the straight answer.";
+export const GREETING = ["Hey! I'm the Rift Guide — a pre-written FAQ bot, not AI. Pick a question below and I'll give you the straight answer."];
 
 export const QUESTIONS = [
   {
